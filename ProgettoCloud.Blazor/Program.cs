@@ -1,10 +1,19 @@
-using ProgrettoCloud.Blazor.Components;
+using Microsoft.OpenApi.Models;
+using ProgettoCloud.Service;
+using ProgettoCloud.Blazor.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddControllers();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// aggiungo come singleton il servizio che ho sviluppato
+builder.Services.AddSingleton<CheckVatService>();
 
 var app = builder.Build();
 
@@ -16,10 +25,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.MapControllers();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

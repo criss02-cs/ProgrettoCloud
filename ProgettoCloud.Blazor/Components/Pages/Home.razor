@@ -1,0 +1,121 @@
+﻿@page "/"
+
+@rendermode InteractiveServer
+@inject CheckVatService CheckVatService
+
+
+<PageTitle>Home</PageTitle>
+
+<p>
+    Per verificare la validità di una partita IVA in un determinato paese,
+    scegliere dall'apposito menu lo Stato membro in cui la verifica deve essere effettuata
+    e inserire la partita IVA da verificare.
+</p>
+
+<EditForm Model="@Request" OnValidSubmit="OnValidSubmit" FormName="vatRequest">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <div class="mb-3">
+        <label for="CountryCode" class="form-label" style="font-weight: bold">Stato membro*</label>
+        <InputText class="form-control" @bind-Value="Request.CountryCode" id="CountryCode"/>
+        <ValidationMessage For="@(() => Request.CountryCode)"/>
+    </div>
+    <div class="mb-3">
+        <label for="VatNumber" class="form-label" style="font-weight: bold">Partita Iva*</label>
+        <InputText class="form-control" @bind-Value="Request.VatNumber" id="VatNumber"/>
+        <ValidationMessage For="@(() => Request.VatNumber)"/>
+    </div>
+    <button type="submit" class="btn btn-primary">Cerca</button>
+</EditForm>
+
+@if (_isLoading)
+{
+    <div class="spinner-border" role="status">
+        @* <span class="sr-only">Loading...</span> *@
+    </div>
+}
+@if (!_isLoading && _response != null)
+{
+    <div class="container">
+        <div class="row">
+            @if (_response.Valid)
+            {
+                <div class="col fw-bold" style="color: green">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Sì, partita IVA valida</span>
+                </div>
+            }
+            else
+            {
+                <div class="col fw-bold" style="color: red">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                    <span>No, partita IVA non valida</span>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="container">
+        <div class="row" style="border-bottom: 1px solid #cfcfcf;">
+            <div class="col fw-bold" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                Stato membro
+            </div>
+            <div class="col" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                @_response.CountryCode
+            </div>
+        </div>
+        <div class="row" style="border-bottom: 1px solid #cfcfcf;">
+            <div class="col fw-bold" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                Partita IVA
+            </div>
+            <div class="col" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                @_response.VatNumber
+            </div>
+        </div>
+        <div class="row" style="border-bottom: 1px solid #cfcfcf;">
+            <div class="col fw-bold" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                Orario di ricezione della richiesta
+            </div>
+            <div class="col" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                @_response.RequestDate
+            </div>
+        </div>
+        <div class="row" style="border-bottom: 1px solid #cfcfcf;">
+            <div class="col fw-bold" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                Nome
+            </div>
+            <div class="col" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                @_response.Name
+            </div>
+        </div>
+        <div class="row" style="border-bottom: 1px solid #cfcfcf;">
+            <div class="col fw-bold" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                Indirizzo
+            </div>
+            <div class="col" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                @_response.Address
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@code {
+
+    private ResponseDto? _response;
+
+    [SupplyParameterFromForm]
+    private RequestDto Request { get; set; } = new();
+
+    private bool _isLoading = false;
+
+    // protected override void OnInitialized() => Request ??= new();
+
+    private async Task OnValidSubmit()
+    {
+        _isLoading = true;
+        _response = await CheckVatService.CheckVat(Request);
+        _isLoading = false;
+    }
+
+}

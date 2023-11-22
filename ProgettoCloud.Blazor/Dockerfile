@@ -1,8 +1,9 @@
 ﻿# Scarico l'immage di .net 8 e la espongo sulle port 80 e 443
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+# le immagini di .NET 8 utilizzano per default la porta 8080,
+# mentre le versioni precedenti utilizzano la porta 80
+EXPOSE 8080
 
 # Faccio la build del progetto, importando tutti i progetti a cui è referenziato
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build

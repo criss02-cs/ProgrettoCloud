@@ -1,0 +1,127 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using EuropeanVatService
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Home</PageTitle>
+
+<p>
+    Per verificare la validità di una partita IVA in un determinato paese, 
+    scegliere dall'apposito menu lo Stato membro in cui la verifica deve essere effettuata 
+    e inserire la partita IVA da verificare.
+</p>
+
+<EditForm Model="@Request" OnValidSubmit="OnValidSubmit" FormName="vatRequest">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3">
+        <label for="CountryCode" class="form-label" style="font-weight: bold">Stato membro*</label>
+        <InputText class="form-control" @bind-Value="Request.CountryCode" id="CountryCode" />
+        <ValidationMessage For="@(() => Request.CountryCode)"/>
+    </div>
+    <div class="mb-3">
+        <label for="VatNumber" class="form-label" style="font-weight: bold">Partita Iva*</label>
+        <InputText class="form-control" @bind-Value="Request.VatNumber" id="VatNumber"  />
+        <ValidationMessage For="@(() => Request.VatNumber)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Cerca</button>
+</EditForm>
+
+@if (_isLoading)
+{
+    <div class="spinner-border" role="status">
+        @* <span class="sr-only">Loading...</span> *@
+    </div>
+}
+else
+{
+    @if (_response.valid)
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col fw-bold" style="color: green">
+                    <i class="fa-solid fa-circle-check" ></i>
+                    <span>Sì, partita IVA valida</span>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row" style="border-bottom: 1px solid #cfcfcf;">
+                <div class="col fw-bold" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                    Stato membro
+                </div>
+                <div class="col" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                    @_response.countryCode
+                </div>
+            </div>
+            <div class="row" style="border-bottom: 1px solid #cfcfcf;">
+                <div class="col fw-bold" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                    Partita IVA
+                </div>
+                <div class="col" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                    @_response.vatNumber
+                </div>
+            </div>
+            <div class="row" style="border-bottom: 1px solid #cfcfcf;">
+                <div class="col fw-bold" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                    Orario di ricezione della richiesta
+                </div>
+                <div class="col" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                    @_response.requestDate
+                </div>
+            </div>
+            <div class="row" style="border-bottom: 1px solid #cfcfcf;">
+                <div class="col fw-bold" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                    Nome
+                </div>
+                <div class="col" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                    @_response.name
+                </div>
+            </div>
+            <div class="row" style="border-bottom: 1px solid #cfcfcf;">
+                <div class="col fw-bold" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                    Indirizzo
+                </div>
+                <div class="col" style="padding: 0.75rem 2rem 0.75rem 1rem">
+                    @_response.address
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div>
+            <span style="color: red">La partita iva non è valida</span>
+        </div>
+    }
+}
+
+
+
+@code {
+
+    private checkVatResponse? _response = new checkVatResponse() { valid = true};
+    [SupplyParameterFromForm]
+    private VatRequestModel Request { get; set; }
+    private checkVatPortTypeClient _client = new();
+    private bool _isLoading = false;
+
+    protected override void OnInitialized() => Request ??= new();
+
+    internal class VatRequestModel
+    {
+        [Required(ErrorMessage = "Il codice dello stato membro è obbligatorio")]
+        [StringLength(2, MinimumLength = 2, ErrorMessage = "Lo stato membro deve avere 2 caratteri")]
+        public string CountryCode { get; set; }
+        [Required(ErrorMessage = "La partiva iva è obbligatoria")]
+        [StringLength(11, MinimumLength = 11, ErrorMessage = "La partita iva deve essere lunga 11 caratteri")]
+        public string VatNumber { get; set; }
+    }
+
+    private async Task OnValidSubmit()
+    {
+        _isLoading = true;
+        _response = await _client.checkVatAsync(new checkVatRequest(Request.CountryCode, Request.VatNumber));
+        _isLoading = false;
+    }
+}

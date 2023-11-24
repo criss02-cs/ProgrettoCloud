@@ -17,7 +17,14 @@
     <ValidationSummary/>
     <div class="mb-3">
         <label for="CountryCode" class="form-label" style="font-weight: bold">Stato membro*</label>
-        <InputText class="form-control" @bind-Value="Request.CountryCode" id="CountryCode"/>
+        @* <InputText class="form-control" @bind-Value="Request.CountryCode" id="CountryCode"/> *@
+        <InputSelect class="form-select" @bind-Value="Request.CountryCode" id="CountryCode">
+            <option value=""></option>
+            @foreach (var country in _countries)
+            {
+                <option value="@country.Value">@country.Label</option>
+            }
+        </InputSelect>
         <ValidationMessage For="@(() => Request.CountryCode)"/>
     </div>
     <div class="mb-3">
@@ -106,6 +113,38 @@
 
     [SupplyParameterFromForm]
     private RequestDto Request { get; set; } = new();
+
+    private List<SelectItem> _countries = new()
+    {
+        new SelectItem("AT", "Austria"),
+        new SelectItem("BE", "Belgio"),
+        new SelectItem("BG", "Bulgaria"),
+        new SelectItem("CY", "Cipro"),
+        new SelectItem("CZ", "Repubblica ceca"),
+        new SelectItem("DE", "Germania"),
+        new SelectItem("DK", "Danimarca"),
+        new SelectItem("EE", "Estonia"),
+        new SelectItem("EL", "Grecia"),
+        new SelectItem("ES", "Spagna"),
+        new SelectItem("FI", "Finlandia"),
+        new SelectItem("FR", "Francia"),
+        new SelectItem("HR", "Croazia"),
+        new SelectItem("HU", "Ungheria"),
+        new SelectItem("IE", "Irlanda"),
+        new SelectItem("IT", "Italia"),
+        new SelectItem("LT", "Lituania"),
+        new SelectItem("LU", "Lussemburgo"),
+        new SelectItem("LV", "Lettonia"),
+        new SelectItem("MT", "Malta"),
+        new SelectItem("NL", "Paesi Bassi"),
+        new SelectItem("PL", "Polonia"),
+        new SelectItem("PT", "Portogallo"),
+        new SelectItem("RO", "Romania"),
+        new SelectItem("SE", "Svezia"),
+        new SelectItem("SI", "Slovenia"),
+        new SelectItem("SK", "Slovacchia"),
+        new SelectItem("XI", "Irlanda del Nord"),
+    };
 
     private bool _isLoading = false;
 

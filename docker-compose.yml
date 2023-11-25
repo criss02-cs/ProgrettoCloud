@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  progettocloud.blazor:
+    image: ${DOCKER_REGISTRY-}progettocloudblazor
+    build:
+      context: .
+      dockerfile: ProgettoCloud.Blazor/Dockerfile
+    ports:
+        - "8080:8080"
+    container_name: "progetto-cloud"

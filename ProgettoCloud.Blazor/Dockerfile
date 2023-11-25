@@ -4,6 +4,7 @@ WORKDIR /app
 # le immagini di .NET 8 utilizzano per default la porta 8080,
 # mentre le versioni precedenti utilizzano la porta 80
 EXPOSE 8080
+EXPOSE 8081
 
 # Faccio la build del progetto, importando tutti i progetti a cui è referenziato
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -25,3 +26,6 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "ProgettoCloud.Blazor.dll"]
+
+
+# run with command: docker run --rm -it -p 8080:8080 blazor-cloud-project

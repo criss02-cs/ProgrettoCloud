@@ -1,4 +1,4 @@
-﻿# Scarico l'immage di .net 8 e la espongo sulle port 80 e 443
+﻿# Scarico l'immage di .net 8 e la espongo sulle port 8080 e 8081
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 # le immagini di .NET 8 utilizzano per default la porta 8080,

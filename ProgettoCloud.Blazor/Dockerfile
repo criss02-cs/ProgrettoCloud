@@ -27,5 +27,5 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "ProgettoCloud.Blazor.dll"]
 
-
+# build with command: docker build -f ProgettoCloud.Blazor/Dockerfile -t blazor-cloud-project . (make sure that you're positioned on root, where .sln file is located)
 # run with command: docker run --rm -it -p 8080:8080 blazor-cloud-project
